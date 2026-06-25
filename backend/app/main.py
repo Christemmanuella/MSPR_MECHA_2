@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from backend.app.predict import predict_machine
 
@@ -6,6 +7,19 @@ app = FastAPI(
     title="MSPR MECHA 2 - API Maintenance Prédictive",
     description="API FastAPI permettant de prédire si une machine risque de devenir critique lors d'une prochaine observation à partir du modèle LSTM.",
     version="1.0.0"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
