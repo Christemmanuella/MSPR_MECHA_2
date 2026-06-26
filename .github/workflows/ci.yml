@@ -1,0 +1,62 @@
+name: CI - MSPR MECHA 2
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend-check:
+    name: Backend FastAPI check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install backend dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Check Python imports
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mspr_mecha
+          MODEL_PATH: models/lstm_model.keras
+          SCALER_PATH: models/scaler.pkl
+          ENCODER_OPERATION_PATH: models/label_encoder_operation.pkl
+          ENCODER_EFFICIENCY_PATH: models/label_encoder_efficiency.pkl
+          FEATURE_COLS_PATH: models/feature_cols.txt
+        run: |
+          python -m compileall backend
+
+  frontend-check:
+    name: Frontend React check
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: mecha_dashboard_MSPR
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install frontend dependencies
+        run: npm install
+
+      - name: Build frontend
+        run: npm run build
